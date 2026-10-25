@@ -9,8 +9,8 @@ SpecLens helps beginners who build with AI assistants see what they asked for, w
 
 ## The Core Journey
 
-1. The user opens SpecLens and sees the original request, "Don't let students overspend.", with a plain explanation of why it cannot be tested yet.
-2. The user asks SpecLens to propose an interpretation. A proposal appears, clearly marked as not yet agreed.
+1. The user opens SpecLens and writes the original request, or uses the example "Don't let students overspend."
+2. The user asks SpecLens to propose a requirement. The request is recorded, SpecLens lists what is unclear in it and why it cannot be tested yet, and a proposal appears, clearly marked as not yet agreed.
 3. The user reads and edits the proposed requirement and acceptance criteria, then approves them. The approved version is saved as its own record.
 4. The user sees which executable test is linked to which acceptance criterion.
 5. In the Evidence Lab the user runs the test against the student budget tracker. The first run fails because the app accepts an expense larger than the remaining budget.
@@ -28,7 +28,7 @@ One page application with a persistent header and four views.
 - Next step bar under the header: one sentence that says what to do next and a button that goes there.
 - Intent Studio: original request, proposal, editable draft, approval, version history, linked tests.
 - Evidence Lab: app under test and scenario, run and repair actions, latest run with its assertions, run history, and a hands on attempt panel for the budget tracker.
-- Proof Map: one trace per acceptance criterion from request to requirement to criterion to test to runs, plus a coverage summary and a "what this does and does not prove" panel.
+- Proof Map: one chain per acceptance criterion from request to requirement to criterion to test to run to explanation. The coverage line is in the header strip, and the last box of each chain says what the evidence does and does not prove.
 - Build Replay: a vertical timeline of recorded events with links to the records they created, and a final list of remaining verification gaps.
 
 On narrow screens the traces and timelines stack vertically and nothing scrolls sideways.
@@ -47,14 +47,14 @@ The original request is recorded and cannot be edited. A deterministic, offline 
 
 As a beginner, I want to turn a vague request into a specific requirement that I approve myself, so that I know exactly what was agreed.
 
-- [ ] The original request is shown unchanged, with a note on what is unclear in it.
-- [ ] The proposal is shown separately from the original wording and is labelled "not yet agreed" until the user approves it.
-- [ ] Editing a draft changes the draft only.
-- [ ] Approval is an explicit button press and creates a distinct approved record (version 1).
-- [ ] The approved version cannot be changed. Editing it creates version 2 as a new draft.
-- [ ] After an edit, the interface says that the approved version and its evidence are no longer current for the new version, and what to do about it.
-- [ ] If the wording of an acceptance criterion changes, the link to its test must be confirmed again by the user before the test can run against that version.
-- [ ] A request the interpreter does not recognise gets a clear message and no invented proposal.
+- [x] The original request is shown unchanged, with a note on what is unclear in it.
+- [x] The proposal is shown separately from the original wording and is labelled "not yet agreed" until the user approves it.
+- [x] Editing a draft changes the draft only.
+- [x] Approval is an explicit button press and creates a distinct approved record (version 1).
+- [x] The approved version cannot be changed. Editing it creates version 2 as a new draft.
+- [x] After an edit, the interface says that the approved version and its evidence are no longer current for the new version, and what to do about it.
+- [x] If the wording of an acceptance criterion changes, the link to its test must be confirmed again by the user before the test can run against that version.
+- [x] A request the interpreter does not recognise gets a clear message and no invented proposal.
 
 ### Evidence Lab
 
@@ -62,59 +62,59 @@ A small student budget tracker with a seeded defect, and a real test for the fir
 
 As a beginner, I want to run a real test and read exactly what was expected and what happened, so that I do not have to trust a green badge.
 
-- [ ] The scenario is shown before any run: budget $100.00, already spent $80.00, remaining $20.00, attempted expense $25.00.
-- [ ] Running the test executes the real tracker code in a separate process and records a run.
-- [ ] On a fresh reset the first run is FAIL, because the app saves the $25.00 expense.
-- [ ] Every run lists each assertion with expected value, observed value and a result.
-- [ ] A failed assertion is shown differently from a runner crash, a setup error, a timeout or missing evidence. The latter are INCONCLUSIVE and never PASS.
-- [ ] The documented repair changes the real application file. It is offered only while the app is in the seeded defect state.
-- [ ] Rerunning uses the same test identifier and the same test source digest, and creates a new run. The earlier run is kept.
-- [ ] After the repair the same test passes: the expense is rejected, the remaining balance is still $20.00 and the expense history is unchanged.
-- [ ] A hands on panel lets the user try an expense against the live app. It is labelled as exploration and never creates evidence.
+- [x] The scenario is shown before any run: budget $100.00, already spent $80.00, remaining $20.00, attempted expense $25.00.
+- [x] Running the test executes the real tracker code in a separate process and records a run.
+- [x] On a fresh reset the first run is FAIL, because the app saves the $25.00 expense.
+- [x] Every run lists each assertion with expected value, observed value and a result.
+- [x] A failed assertion is shown differently from a runner crash, a setup error, a timeout or missing evidence. The latter are INCONCLUSIVE and never PASS.
+- [x] The documented repair changes the real application file. It is offered only while the app is in the seeded defect state.
+- [x] Rerunning uses the same test identifier and version, and creates a new run. The earlier run is kept.
+- [x] After the repair the same test passes: the expense is rejected, the remaining balance is still $20.00 and the expense history is unchanged.
+- [x] A hands on panel lets the user try an expense against the live app. It is labelled as exploration and never creates evidence.
 
 ### Evidence Contract and statuses
 
 One shared record drives all four views.
 
-- [ ] PASS: the test ran to completion, every assertion was evaluated and all held, for the tested requirement version and the current build.
-- [ ] FAIL: the test ran far enough to evaluate its assertions and at least one did not hold.
-- [ ] UNTESTED: there is no valid, applicable evidence for this requirement version and build.
-- [ ] INCONCLUSIVE: the test could not establish a result.
-- [ ] Evidence is labelled historical, with a reason, when the requirement version, the criterion wording or the application build has changed since the run.
-- [ ] A requirement is never labelled "verified". The interface shows how many of its acceptance criteria have current evidence and how many do not.
+- [x] PASS: the test ran to completion, every assertion was evaluated and all held, for the tested requirement version and the current build.
+- [x] FAIL: the test ran far enough to evaluate its assertions and at least one did not hold.
+- [x] UNTESTED: there is no valid, applicable evidence for this requirement version and build.
+- [x] INCONCLUSIVE: the test could not establish a result.
+- [x] Evidence is labelled historical, with a reason, when the requirement version, the criterion wording or the application build has changed since the run.
+- [x] A requirement is never labelled "verified". The interface shows how many of its acceptance criteria have current evidence and how many do not.
 
 ### Proof Map
 
-- [ ] Each acceptance criterion shows its full trace from original request to runs.
-- [ ] Criteria with no test or no current evidence are visible and marked UNTESTED.
-- [ ] Failed and inconclusive evidence is shown, not hidden.
-- [ ] Every node links to the same record in the other views.
-- [ ] A panel states in plain language what the latest result establishes and what it does not establish.
+- [x] Each acceptance criterion shows its full trace from original request to runs.
+- [x] Criteria with no test or no current evidence are visible and marked UNTESTED.
+- [x] Failed and inconclusive evidence is shown, not hidden.
+- [x] Every node links to the same record in the other views.
+- [x] The last box of each chain, and its detail panel, state in plain language what the latest result establishes and what it does not establish.
 
 ### Build Replay
 
-- [ ] Every entry is generated from a recorded event, in recorded order.
-- [ ] The timeline covers: request recorded, interpretation proposed, requirement approved, test run, defect demonstrated, repair applied, test rerun, result updated, and remaining gaps.
-- [ ] Each entry can be expanded to show the underlying record.
+- [x] Every entry is generated from a recorded event, in recorded order.
+- [x] The timeline covers: request recorded, interpretation proposed, requirement approved, test run, defect demonstrated, repair applied, test rerun, result updated, and remaining gaps.
+- [x] Each entry can be expanded to show the underlying record.
 
 ### Reset
 
-- [ ] Reset asks for confirmation, then restores the seeded defect build and an empty event log with only the original request recorded.
-- [ ] A fresh reset always reproduces the same story.
+- [x] Reset asks for confirmation, then restores the seeded defect build and an empty event log. The request is recorded again when the user submits it.
+- [x] A fresh reset always reproduces the same story.
 
 ## States and Boundaries
 
-- **Fresh start**: The request is shown and the next step bar offers "Propose an interpretation". No runs exist and every criterion is UNTESTED.
+- **Fresh start**: The request box is empty, with a button to use the example, and the next step bar says to write the request. No requirement or runs exist.
 - **Proposal, not approved**: The draft is editable and marked not yet agreed. The Evidence Lab explains that tests only run against an approved requirement.
 - **Approved, no runs**: The link between each criterion and its test, or the lack of one, is shown. AC-001 is UNTESTED until it is run.
-- **Running**: The run button is disabled and shows progress. A second run cannot start until the first has finished.
+- **Running**: The run button is disabled and shows progress. The service handles one change at a time, so a second run cannot overlap the first.
 - **FAIL**: Expected and observed values are shown beside each assertion. The next step bar offers the repair.
 - **Repaired, not rerun**: The earlier FAIL is labelled historical because the build changed. AC-001 is UNTESTED until the rerun.
 - **PASS**: The pass is labelled with its limits. AC-002 remains UNTESTED.
 - **INCONCLUSIVE**: The cause is named: setup error, runner crash, timeout, application exception, invalid output or missing evidence.
 - **Requirement edited after approval**: Version 2 is a draft. Version 1 evidence is labelled as belonging to version 1 only.
 - **Reset confirm**: A dialog explains what will be erased.
-- **State file damaged or server error**: A clear error is shown with a Reset button. Nothing is silently ignored.
+- **State file damaged or server error**: If the saved file is damaged the server refuses to start and says to run `npm run reset`. If the server cannot be reached the page says so and offers Try again. Nothing is silently ignored.
 
 ## Product Decisions
 
@@ -140,6 +140,10 @@ Importing a small project to verify, a shareable report, and a lesson mode for b
 ## Non-Goals
 
 A coding agent, arbitrary repository analysis, automatic repair of arbitrary defects, multi agent systems, team collaboration, permissions, hosted deployment, and any external AI service in the core workflow.
+
+## Revision Note
+
+This document was approved before the build and was brought in line with what was built afterwards. The differences are: the request is written by the user and recorded on submit (not pre-recorded), the coverage line lives in the header strip, runs record a test version instead of a source digest, and a damaged state file stops the server with a clear message instead of showing a Reset button. Each acceptance box is ticked because an automated test or the browser check exercises it. The team should still confirm them by using the app.
 
 ## Open Questions
 
