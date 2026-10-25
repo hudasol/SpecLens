@@ -332,7 +332,7 @@ export async function createService({
         return done({ reset: true });
       }),
 
-    // A hands-on try of the app. It is not evidence: nothing is recorded and no result changes.
+    // A hands on try of the app. It is not evidence: nothing is recorded and no result changes.
     probeAttempt: (input) =>
       exclusive(async () => {
         const amountCents =
@@ -340,7 +340,7 @@ export async function createService({
         if (amountCents === null || amountCents < 1) {
           throw new ServiceError('invalid_request', 'Enter an amount in dollars, such as 25 or 25.50.', 400);
         }
-        const scenario = { ...SCENARIO, attempt: { label: 'Hands-on expense', amountCents } };
+        const scenario = { ...SCENARIO, attempt: { label: 'Hands on expense', amountCents } };
         const execution = await executeScenario({ appPath, scenario, timeoutMs: runTimeoutMs });
         const digest = await currentDigest();
         if (execution.status !== 'completed' || execution.report?.ok !== true) {

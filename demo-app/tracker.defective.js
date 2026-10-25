@@ -1,7 +1,7 @@
 // Student budget tracker: the application under test.
 //
 // This is the pristine copy that contains one deliberately seeded defect.
-// SpecLens copies it to .speclens/app/tracker.js when the demo is reset.
+// SpecLens copies it to .speclens/app/tracker.mjs when the demo starts and when it is reset.
 // Tests run against the copy, never against this file. Do not fix it here.
 //
 // All amounts are whole cents, so a budget never suffers from rounding errors.

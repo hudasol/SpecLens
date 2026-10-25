@@ -430,7 +430,7 @@ describe('integrity checks made by the service itself', () => {
   });
 });
 
-describe('the hands-on probe', () => {
+describe('the hands on probe', () => {
   it('shows what the app does and records nothing', async () => {
     const { service } = await approvedService();
     const before = await service.getState();

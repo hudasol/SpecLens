@@ -9,7 +9,6 @@ import { formatCents } from './money.js';
 import { shortDigest } from './digest.js';
 import { getTest } from './catalog.js';
 
-export const OUTCOMES = Object.freeze(['PASS', 'FAIL', 'UNTESTED', 'INCONCLUSIVE']);
 
 export const CAUSE_LABELS = Object.freeze({
   timeout: 'The test did not finish in time.',

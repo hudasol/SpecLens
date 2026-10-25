@@ -1,4 +1,4 @@
-import { bulletList, chip, h, idCode, notice, statusBadge } from '../dom.js';
+import { chip, h, idCode, notice } from '../dom.js';
 import { formatCents } from '../format.js';
 import { emptyState, pageHeading, panel, runDetail, runSummaryLine } from './shared.js';
 

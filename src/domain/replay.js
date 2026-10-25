@@ -1,7 +1,6 @@
 // Build Replay: a timeline of what was recorded, in order. Every row is one stored event.
 // The "result updated" notes are derived by comparing the shown results before and after an event.
 
-import { formatCents } from './money.js';
 import { shortDigest } from './digest.js';
 import { deriveState } from './state.js';
 

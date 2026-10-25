@@ -6,7 +6,7 @@ import { normalizeText } from './digest.js';
 import { CANONICAL, INTENT_ID, REQUIREMENT_ID } from './catalog.js';
 import { LIMITS, cleanText } from './requirements.js';
 
-export const INTERPRETER_ID = 'rule-based-demo-v1';
+export const INTERPRETER_ID = 'offline rules v1';
 
 const PATTERN =
   /\b(?:don'?t|do not|never|must not|should not|shouldn'?t)\b.*\b(?:let|allow|permit)\b.*\b(?:students?|users?)\b.*\b(?:over-?spend|spend more than|exceed(?:ing)? (?:their|the) (?:budget|balance))/;
