@@ -14,10 +14,14 @@ export const REPAIR_001 = Object.freeze({
 // Returns { ok: true, source } or { ok: false, reason }. Never throws for bad input.
 export function applyRepairToSource(source, repair = REPAIR_001) {
   if (typeof source !== 'string') return { ok: false, reason: 'source_not_text' };
-  const parts = source.split(repair.find);
+  // A copy saved with Windows line endings must match too, and keeps those line endings.
+  const windows = source.includes('\r\n');
+  const find = windows ? repair.find.replace(/\n/g, '\r\n') : repair.find;
+  const replace = windows ? repair.replace.replace(/\n/g, '\r\n') : repair.replace;
+  const parts = source.split(find);
   if (parts.length === 1) return { ok: false, reason: 'defect_marker_not_found' };
   if (parts.length > 2) return { ok: false, reason: 'defect_marker_ambiguous' };
-  return { ok: true, source: parts.join(repair.replace) };
+  return { ok: true, source: parts.join(replace) };
 }
 
 // What the user sees as the patch: the removed and added lines, without code indentation noise.

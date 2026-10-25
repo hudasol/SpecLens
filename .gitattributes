@@ -1,0 +1,3 @@
+# Keep line endings identical on every computer. The documented repair matches exact text.
+* text=auto eol=lf
+*.svg text eol=lf

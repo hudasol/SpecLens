@@ -142,6 +142,19 @@ describe('the documented repair', () => {
     assert.ok(changed[0].includes('exceeds_remaining_budget'));
   });
 
+  it('also applies to a copy saved with Windows line endings and keeps them', async () => {
+    const seed = await readSeed();
+    const windows = seed.replace(/\r?\n/g, '\r\n');
+    const result = applyRepairToSource(windows);
+    assert.equal(result.ok, true);
+    assert.equal(result.source, applyRepairToSource(seed).source.replace(/\r?\n/g, '\r\n'));
+    assert.equal(result.source.includes('\n') && !/[^\r]\n/.test(result.source), true);
+    const { createTracker } = await loadTracker(result.source);
+    const tracker = createTracker({ budgetCents: BUDGET });
+    tracker.addExpense({ label: 'One', amountCents: 8000 });
+    assert.equal(tracker.addExpense({ label: 'Two', amountCents: 2500 }).ok, false);
+  });
+
   it('refuses to apply twice, to unrelated text, or to ambiguous text', async () => {
     const once = (await applyRepairToSource(await readSeed())).source;
     assert.deepEqual(applyRepairToSource(once), { ok: false, reason: 'defect_marker_not_found' });

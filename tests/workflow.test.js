@@ -110,6 +110,23 @@ describe('the full journey through the service', () => {
   });
 });
 
+describe('a checkout with Windows line endings', () => {
+  it('starts, fails, repairs and passes the same way', async () => {
+    const folder = await tempDir('speclens-crlf-');
+    const seedPath = path.join(folder, 'tracker.defective.js');
+    await writeFile(seedPath, (await readSeed()).replace(/\r?\n/g, '\r\n'));
+    const dataDir = await tempDir('speclens-data-');
+    const service = await createService({ dataDir, seedPath, now: clock });
+
+    await service.proposeInterpretation(INTENT_EXAMPLE);
+    await service.approveRequirement();
+    assert.equal((await service.runTest('TEST-001')).outcome, 'FAIL');
+    const repaired = await service.applyRepair('REPAIR-001');
+    assert.equal(repaired.state.app.state, 'repaired');
+    assert.equal((await service.runTest('TEST-001')).outcome, 'PASS');
+  });
+});
+
 describe('reset', () => {
   it('restores the seeded state exactly, so a second run starts from the same place', async () => {
     const fresh = await newService();
