@@ -18,7 +18,7 @@ The build is cut into thin slices. Each slice leaves the project in a working, t
 - [x] 8. Proof Map
 - [x] 9. Build Replay
 - [x] 10. Workflow, integration and HTTP tests; browser check at desktop and mobile widths
-- [ ] 11. README, demo script, and planning documents brought in line with what was built
+- [x] 11. README, demo script, and planning documents brought in line with what was built
 - [ ] 12. Final audit: secrets, branding, wording, and an honest delivery report
 
 ## Rules for every slice

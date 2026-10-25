@@ -126,6 +126,16 @@ export function renderMap(ctx) {
   );
 }
 
+// The boxes that stand for something missing have internal ids. Show a plain title instead.
+function placeholderTitle(id) {
+  const match = /^(NOTEST|NORUN|EXPL)-(.+)$/.exec(id);
+  if (!match) return null;
+  const words = { NOTEST: 'Details: no test for', NORUN: 'Details: no current run for', EXPL: 'Details: what the evidence for' }[match[1]];
+  return match[1] === 'EXPL'
+    ? [`${words} `, idCode(match[2]), ' does and does not show']
+    : [`${words} `, idCode(match[2])];
+}
+
 function detailPanel(state, id) {
   if (!id) {
     return panel('Details', h('p', null, 'Select a box in a chain to see the record behind it.'));
@@ -137,7 +147,7 @@ function detailPanel(state, id) {
   return h(
     'section',
     { class: 'panel', id: 'detail', tabindex: '-1', 'aria-label': `Details for ${id}` },
-    h('h2', null, 'Details for ', idCode(id)),
+    h('h2', null, ...(placeholderTitle(id) ?? ['Details for ', idCode(id)])),
     body,
   );
 }
