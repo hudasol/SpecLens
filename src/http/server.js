@@ -54,16 +54,20 @@ function readJsonBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
+    let tooLarge = false;
+    // An oversized body is read and thrown away, never stored, so the client gets a clear 413
+    // instead of a dropped connection and memory stays small.
     req.on('data', (chunk) => {
       size += chunk.length;
       if (size > MAX_BODY_BYTES) {
-        reject(new ServiceError('too_large', 'The request is too large.', 413));
-        req.destroy();
+        tooLarge = true;
+        chunks.length = 0;
         return;
       }
       chunks.push(chunk);
     });
     req.on('end', () => {
+      if (tooLarge) return reject(new ServiceError('too_large', 'The request is too large.', 413));
       const text = Buffer.concat(chunks).toString('utf8');
       if (text.trim() === '') return resolve({});
       try {
@@ -165,7 +169,10 @@ export function createHttpServer({ service, publicDir, host = '127.0.0.1' }) {
       if (pathname.startsWith('/api/')) return await handleApi(req, res, pathname);
       return await handleStatic(req, res, pathname);
     } catch (error) {
-      if (error instanceof ServiceError) return sendError(res, error.status, error.code, error.message);
+      if (error instanceof ServiceError) {
+        const close = error.status === 413 ? { Connection: 'close' } : undefined;
+        return sendError(res, error.status, error.code, error.message, close);
+      }
       console.error('Unexpected error:', error);
       return sendError(res, 500, 'internal_error', 'Something went wrong inside SpecLens.');
     }

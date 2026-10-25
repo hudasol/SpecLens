@@ -110,6 +110,27 @@ describe('the full journey through the service', () => {
   });
 });
 
+describe('an app that changes its own file while the test runs', () => {
+  it('is INCONCLUSIVE, because the run cannot be tied to one build', async () => {
+    const folder = await tempDir('speclens-selfedit-');
+    const seedPath = path.join(folder, 'tracker.defective.js');
+    const source = await readSeed();
+    await writeFile(seedPath, `${source}\nconst { appendFileSync } = await import('node:fs');\nappendFileSync(process.argv[2], '\\n// changed while running\\n');\n`);
+    const dataDir = await tempDir('speclens-data-');
+    const service = await createService({ dataDir, seedPath, now: clock });
+    await service.proposeInterpretation(INTENT_EXAMPLE);
+    await service.approveRequirement();
+
+    const run = await service.runTest('TEST-001');
+    assert.equal(run.outcome, 'INCONCLUSIVE');
+    const state = await service.getState();
+    assert.equal(state.runs[0].cause, 'build_changed_during_run');
+    // The file now differs from the one the run used, so the run is historical and nothing is current.
+    assert.equal(state.runs[0].current, false);
+    assert.equal(criterion(state, 'AC-001').status, 'UNTESTED');
+  });
+});
+
 describe('a checkout with Windows line endings', () => {
   it('starts, fails, repairs and passes the same way', async () => {
     const folder = await tempDir('speclens-crlf-');

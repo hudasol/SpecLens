@@ -135,8 +135,9 @@ describe('who may talk to the server', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: 'x'.repeat(100 * 1024) }),
-    }).catch(() => ({ status: 413 }));
+    });
     assert.equal(big.status, 413);
+    assert.equal((await big.json()).error.code, 'too_large');
   });
 
   it('answers unknown endpoints and wrong methods clearly', async () => {

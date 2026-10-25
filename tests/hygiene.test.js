@@ -85,7 +85,7 @@ describe('published files', () => {
     assert.deepEqual(await offenders(pattern, (file) => file === 'tests/hygiene.test.js')(), []);
   });
 
-  it('contain no email addresses other than the contact shown in the license holder line', async () => {
+  it('contain no email addresses', async () => {
     const found = await offenders(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)();
     assert.deepEqual(found, []);
   });
