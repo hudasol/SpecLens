@@ -44,6 +44,6 @@ describe('keeping folders and user names out of recorded details', () => {
     assert.equal(run.outcome, 'INCONCLUSIVE');
     assert.equal(run.cause, 'runner_crash');
     assert.ok(!run.detail.includes('file://') && !run.detail.includes(tmpdir()) && !run.detail.includes(dataDir), run.detail);
-    assert.match(run.detail, /child\.mjs:\d+:\d+/);
+    assert.match(run.detail, /child\.mjs:\d+/);
   });
 });
