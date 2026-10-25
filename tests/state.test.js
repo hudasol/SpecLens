@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { sha256 } from '../src/domain/digest.js';
 import { buildReplay } from '../src/domain/replay.js';
 import { deriveState } from '../src/domain/state.js';
 import { validateLog } from '../src/domain/events.js';
-import { CTX_REPAIRED, CTX_SEED, REPAIRED_DIGEST, SEED_DIGEST, logBuilder, observations } from './fixtures.js';
+import { CTX_REPAIRED, CTX_SEED, REPAIRED_DIGEST, SEED_DIGEST, logBuilder } from './fixtures.js';
 
 const criterion = (state, id) => state.criteria.find((item) => item.id === id);
 
@@ -310,8 +311,23 @@ describe('build replay', () => {
     assert.deepEqual(last.annotations.map((a) => `${a.from}>${a.to}`), ['PASS>UNTESTED']);
   });
 
-  it('keeps the observation helper honest about what each build does', () => {
-    assert.equal(observations({ accepts: true }).attempt.result.ok, true);
-    assert.equal(observations({ accepts: false }).attempt.result.ok, false);
+  it('shows the verified outcome of a run, never the stored label', () => {
+    const log = logBuilder().propose().approve().run({ accepts: true });
+    log.events[log.events.length - 1].data.outcome = 'PASS';
+    const row = buildReplay(log.events, replayCtx).items.at(-1);
+    assert.equal(row.title, 'TEST-001 ran: INCONCLUSIVE');
+    assert.equal(row.tone, 'warning');
+    assert.match(row.detail, /own observations do not support that/);
+  });
+
+  it('uses the real app file for what is not proven, not only what events imply', () => {
+    const log = logBuilder().propose().approve().run({ accepts: true }).repair().run({ accepts: false, buildDigest: REPAIRED_DIGEST });
+    const untouched = buildReplay(log.events, { ...replayCtx, currentBuildDigest: REPAIRED_DIGEST });
+    assert.ok(!untouched.gaps.some((gap) => gap.startsWith('AC-001')));
+    assert.ok(!untouched.gaps.some((gap) => /changed outside SpecLens/.test(gap)));
+
+    const edited = buildReplay(log.events, { ...replayCtx, currentBuildDigest: sha256('edited by hand') });
+    assert.ok(edited.gaps.some((gap) => /changed outside SpecLens/.test(gap)));
+    assert.ok(edited.gaps.some((gap) => gap.startsWith('AC-001 is UNTESTED')));
   });
 });

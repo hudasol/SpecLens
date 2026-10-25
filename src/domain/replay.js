@@ -12,7 +12,7 @@ export function digestAfter(events, seedDigest) {
   return seedDigest;
 }
 
-function describeEvent(event) {
+function describeEvent(event, run) {
   const d = event.data ?? {};
   switch (event.type) {
     case 'intent_recorded':
@@ -47,16 +47,24 @@ function describeEvent(event) {
         tone: 'neutral',
         view: 'intent',
       };
-    case 'test_run_recorded':
+    case 'test_run_recorded': {
+      // Show the verified outcome, never the stored label. A record that does not match
+      // its own observations is shown the same way here as in the Proof Map.
+      const outcome = run?.outcome ?? 'INCONCLUSIVE';
+      const contradicted = run ? run.recordedOutcome !== run.outcome : true;
+      const text = contradicted
+        ? `The record says ${d.outcome}, but its own observations do not support that, so it is shown as INCONCLUSIVE.`
+        : d.detail;
       return {
-        title: `${d.testId} ran: ${d.outcome}`,
+        title: `${d.testId} ran: ${outcome}`,
         detail:
-          d.outcome === 'INCONCLUSIVE'
-            ? `${d.detail} Build ${shortDigest(d.buildDigest)}.`
-            : `${d.detail} Build ${shortDigest(d.buildDigest)}, ${formatDuration(d.durationMs)}.`,
-        tone: d.outcome === 'PASS' ? 'pass' : d.outcome === 'FAIL' ? 'fail' : 'warning',
+          outcome === 'INCONCLUSIVE'
+            ? `${text} Build ${shortDigest(d.buildDigest)}.`
+            : `${text} Build ${shortDigest(d.buildDigest)}, ${formatDuration(d.durationMs)}.`,
+        tone: outcome === 'PASS' ? 'pass' : outcome === 'FAIL' ? 'fail' : 'warning',
         view: 'lab',
       };
+    }
     case 'app_repaired':
       return {
         title: `${d.repairId} applied`,
@@ -77,10 +85,9 @@ function statusMap(state) {
   return new Map(state.criteria.map((criterion) => [criterion.id, criterion]));
 }
 
-export function buildReplay(events, { seedDigest, repairedDigest }) {
+export function buildReplay(events, { seedDigest, repairedDigest, currentBuildDigest }) {
   const items = [];
   let previous = new Map();
-  let finalState = null;
 
   events.forEach((event, index) => {
     const prefix = events.slice(0, index + 1);
@@ -90,6 +97,7 @@ export function buildReplay(events, { seedDigest, repairedDigest }) {
       repairedDigest,
     });
     const now = statusMap(state);
+    const run = event.type === 'test_run_recorded' ? state.runs.find((item) => item.id === event.data.runId) : null;
     const annotations = [];
     for (const [id, criterion] of now) {
       const before = previous.get(id);
@@ -112,7 +120,7 @@ export function buildReplay(events, { seedDigest, repairedDigest }) {
       at: event.at,
       actor: event.actor,
       type: event.type,
-      ...describeEvent(event),
+      ...describeEvent(event, run),
       refs: {
         runId: event.type === 'test_run_recorded' ? event.data.runId : null,
         version: event.data?.version ?? null,
@@ -120,11 +128,19 @@ export function buildReplay(events, { seedDigest, repairedDigest }) {
       annotations,
     });
     previous = now;
-    finalState = state;
   });
 
+  // Rows describe what was recorded. The list of gaps describes the record as it stands now,
+  // using the real app file, so a change made outside SpecLens cannot leave a stale result here.
+  const recordedDigest = digestAfter(events, seedDigest);
+  const finalState = events.length
+    ? deriveState(events, { currentBuildDigest: currentBuildDigest ?? recordedDigest, seedDigest, repairedDigest })
+    : null;
   const gaps = [];
   if (finalState) {
+    if (currentBuildDigest && currentBuildDigest !== recordedDigest) {
+      gaps.push('The app file was changed outside SpecLens after the last recorded event. Earlier runs no longer count as current evidence.');
+    }
     if (!finalState.requirement) gaps.push('No requirement has been drafted yet.');
     else if (finalState.requirement.versions.at(-1).status !== 'approved') {
       gaps.push(`Requirement version ${finalState.requirement.latestVersion} is a draft and has not been approved.`);
