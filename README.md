@@ -58,7 +58,7 @@ npm start
 
 Then open http://127.0.0.1:4173 in a browser. The server listens on this computer only. To use another port, set `PORT` before starting. The optional settings are listed in `.env.example`. No secret is ever needed.
 
-The automated checks were run on Node.js 22 on Linux. The declared minimum is Node.js 20. SpecLens has not yet been run on Windows or macOS by its authors, so please report anything that behaves differently there.
+The 171 automated tests were run on Node.js 20 and on Node.js 22, both on Linux. SpecLens has not yet been run on Windows or macOS, so please report anything that behaves differently there.
 
 ## Run the automated tests
 
