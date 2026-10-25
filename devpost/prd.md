@@ -104,26 +104,26 @@ One shared record drives all four views.
 
 ## States and Boundaries
 
-- **Fresh start** — The request is shown and the next step bar offers "Propose an interpretation". No runs exist and every criterion is UNTESTED.
-- **Proposal, not approved** — The draft is editable and marked not yet agreed. The Evidence Lab explains that tests only run against an approved requirement.
-- **Approved, no runs** — The link between each criterion and its test, or the lack of one, is shown. AC-001 is UNTESTED until it is run.
-- **Running** — The run button is disabled and shows progress. A second run cannot start until the first has finished.
-- **FAIL** — Expected and observed values are shown beside each assertion. The next step bar offers the repair.
-- **Repaired, not rerun** — The earlier FAIL is labelled historical because the build changed. AC-001 is UNTESTED until the rerun.
-- **PASS** — The pass is labelled with its limits. AC-002 remains UNTESTED.
-- **INCONCLUSIVE** — The cause is named: setup error, runner crash, timeout, application exception, invalid output or missing evidence.
-- **Requirement edited after approval** — Version 2 is a draft. Version 1 evidence is labelled as belonging to version 1 only.
-- **Reset confirm** — A dialog explains what will be erased.
-- **State file damaged or server error** — A clear error is shown with a Reset button. Nothing is silently ignored.
+- **Fresh start**: The request is shown and the next step bar offers "Propose an interpretation". No runs exist and every criterion is UNTESTED.
+- **Proposal, not approved**: The draft is editable and marked not yet agreed. The Evidence Lab explains that tests only run against an approved requirement.
+- **Approved, no runs**: The link between each criterion and its test, or the lack of one, is shown. AC-001 is UNTESTED until it is run.
+- **Running**: The run button is disabled and shows progress. A second run cannot start until the first has finished.
+- **FAIL**: Expected and observed values are shown beside each assertion. The next step bar offers the repair.
+- **Repaired, not rerun**: The earlier FAIL is labelled historical because the build changed. AC-001 is UNTESTED until the rerun.
+- **PASS**: The pass is labelled with its limits. AC-002 remains UNTESTED.
+- **INCONCLUSIVE**: The cause is named: setup error, runner crash, timeout, application exception, invalid output or missing evidence.
+- **Requirement edited after approval**: Version 2 is a draft. Version 1 evidence is labelled as belonging to version 1 only.
+- **Reset confirm**: A dialog explains what will be erased.
+- **State file damaged or server error**: A clear error is shown with a Reset button. Nothing is silently ignored.
 
 ## Product Decisions
 
-- Rule based interpreter instead of an AI model — the core workflow must be deterministic, offline and reproducible.
-- Execute the test in a separate process — a crash or timeout must be distinguishable from an assertion failure.
-- One event log as the only source of truth — every view and the replay are derived from it, so they cannot disagree.
-- Exactly equal to the remaining budget is allowed — spending the last dollar is not overspending. This is written into AC-002.
-- Money is stored as whole cents — it avoids rounding errors in a budget tool.
-- PASS is not green — the interface must not read as proof of correctness.
+- Rule based interpreter instead of an AI model: the core workflow must be deterministic, offline and reproducible.
+- Execute the test in a separate process: a crash or timeout must be distinguishable from an assertion failure.
+- One event log as the only source of truth: every view and the replay are derived from it, so they cannot disagree.
+- Exactly equal to the remaining budget is allowed: spending the last dollar is not overspending. This is written into AC-002.
+- Money is stored as whole cents: it avoids rounding errors in a budget tool.
+- PASS is not green: the interface must not read as proof of correctness.
 
 ## What We're Building
 

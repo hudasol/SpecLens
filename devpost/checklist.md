@@ -13,11 +13,11 @@ The build is cut into thin slices. Each slice leaves the project in a working, t
 - [x] 3. Real test execution in an isolated process, with INCONCLUSIVE handling
 - [x] 4. Service layer: the only place that changes state, plus atomic storage and reset
 - [x] 5. Local HTTP server and JSON API
-- [ ] 6. Intent Studio and the shared shell
-- [ ] 7. Evidence Lab
-- [ ] 8. Proof Map
-- [ ] 9. Build Replay
-- [ ] 10. Workflow, integration and HTTP tests; browser check at desktop and mobile widths
+- [x] 6. Intent Studio and the shared shell
+- [x] 7. Evidence Lab
+- [x] 8. Proof Map
+- [x] 9. Build Replay
+- [x] 10. Workflow, integration and HTTP tests; browser check at desktop and mobile widths
 - [ ] 11. README, demo script, and planning documents brought in line with what was built
 - [ ] 12. Final audit: secrets, branding, wording, and an honest delivery report
 

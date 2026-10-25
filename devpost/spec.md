@@ -155,11 +155,11 @@ None at runtime. No network calls, no accounts, no keys. A .env.example document
 
 ## What Was Simplified and Why
 
-- **One test and one scenario** instead of a test suite per requirement — a complete, honest story is worth more than breadth in a first version.
-- **A rule based interpreter** instead of an AI model — the core workflow must be deterministic and run offline.
-- **A JSON event file** instead of a database — one process, one user, and reset must be trivial.
-- **A fixed, documented repair** instead of automatic repair — SpecLens verifies; it does not fix arbitrary code.
-- **Plain JavaScript modules for the front end** instead of a framework — no build step and nothing to install.
+- **One test and one scenario** instead of a test suite per requirement: a complete, honest story is worth more than breadth in a first version.
+- **A rule based interpreter** instead of an AI model: the core workflow must be deterministic and run offline.
+- **A JSON event file** instead of a database: one process, one user, and reset must be trivial.
+- **A fixed, documented repair** instead of automatic repair: SpecLens verifies; it does not fix arbitrary code.
+- **Plain JavaScript modules for the front end** instead of a framework: no build step and nothing to install.
 
 ## Decisions and Open Issues
 
