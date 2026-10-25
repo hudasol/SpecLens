@@ -9,6 +9,7 @@ import { classifyRun, inconclusive } from '../domain/evidence.js';
 import { makeEvent, runId } from '../domain/events.js';
 import { INTERPRETER_ID, interpretIntent } from '../domain/interpreter.js';
 import { parseDollarsToCents } from '../domain/money.js';
+import { scrubPaths } from '../domain/privacy.js';
 import { buildReplay } from '../domain/replay.js';
 import { LIMITS, contentDigest, validateEdit } from '../domain/requirements.js';
 import { deriveState } from '../domain/state.js';
@@ -272,7 +273,7 @@ export async function createService({
               durationMs: execution.durationMs ?? null,
               outcome: verdict.outcome,
               cause: verdict.cause,
-              detail: verdict.detail,
+              detail: scrubPaths(verdict.detail),
               checks: verdict.checks,
               observations,
             },
@@ -344,7 +345,7 @@ export async function createService({
           return {
             recorded: false,
             ok: false,
-            detail: execution.detail ?? execution.report?.error ?? 'The app did not answer.',
+            detail: scrubPaths(execution.detail ?? execution.report?.error ?? 'The app did not answer.'),
             build: shortDigest(digest),
             state: await view(),
           };

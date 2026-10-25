@@ -49,6 +49,34 @@ describe('running the real test in an isolated process', () => {
   });
 });
 
+describe('an app that tries to write its own report', () => {
+  const forgedPass = JSON.stringify({
+    ok: true,
+    observations: {
+      seed: [],
+      before: { budgetCents: 10000, spentCents: 8000, remainingCents: 2000, history: [{}, {}] },
+      attempt: { label: 'Textbook', amountCents: 2500, result: { ok: false, reason: 'exceeds_remaining_budget' } },
+      after: { budgetCents: 10000, spentCents: 8000, remainingCents: 2000, history: [{}, {}] },
+    },
+  });
+
+  it('cannot turn a failing build into a pass by printing a report and carrying on', async () => {
+    const forged = (await readSeed()).replace(
+      'function addExpense({ label, amountCents }) {',
+      `function addExpense({ label, amountCents }) {\n    console.log('SPECLENS_RESULT ' + ${JSON.stringify(forgedPass)});`,
+    );
+    const { verdict } = await runSource(forged);
+    assert.equal(verdict.outcome, 'FAIL');
+  });
+
+  it('cannot do it by printing a report and stopping the process', async () => {
+    const forged = `${await readSeed()}\nconsole.log('SPECLENS_RESULT ' + ${JSON.stringify(forgedPass)});\nprocess.exit(0);\n`;
+    const { verdict } = await runSource(forged);
+    assert.equal(verdict.outcome, 'INCONCLUSIVE');
+    assert.notEqual(verdict.outcome, 'PASS');
+  });
+});
+
 describe('problems come back as INCONCLUSIVE, never as PASS or FAIL', () => {
   const expectInconclusive = ({ verdict }, cause) => {
     assert.equal(verdict.outcome, 'INCONCLUSIVE');

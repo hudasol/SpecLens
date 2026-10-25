@@ -2,6 +2,8 @@
 // It reports observations only. It never decides PASS or FAIL: the parent process does that.
 //
 // Usage: node child.mjs <path to app file> <scenario as JSON>
+// The parent sends a one time token on standard input. It is read before the app is loaded and kept
+// out of reach of the app, and the report must carry it. A line the app prints on its own cannot.
 
 import { writeSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -9,9 +11,13 @@ import { pathToFileURL } from 'node:url';
 const MARK = 'SPECLENS_RESULT ';
 let stage = 'setup';
 
+let token = '';
+for await (const chunk of process.stdin) token += chunk;
+token = token.trim();
+
 // Synchronous, so the report is written completely before the process exits.
 function emit(report) {
-  writeSync(1, `${MARK}${JSON.stringify(report)}\n`);
+  writeSync(1, `${MARK}${token} ${JSON.stringify(report)}\n`);
 }
 
 function fail(error) {

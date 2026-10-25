@@ -186,6 +186,7 @@ describe('which runs are current evidence', () => {
   const run = (overrides) => ({
     id: 'RUN-0001',
     testId: 'TEST-001',
+    testVersion: 1,
     criterionId: 'AC-001',
     criterionSignature: 'sig-a',
     requirementVersion: 1,
@@ -217,6 +218,13 @@ describe('which runs are current evidence', () => {
   it('makes a run historical when the app code changed', () => {
     const [only] = assessRuns([run({})], { ...ctx, currentBuildDigest: 'build-2' });
     assert.deepEqual(only.reasons, ['build_changed']);
+  });
+
+  it('makes a run historical when it was made by a different version of the test', () => {
+    const [only] = assessRuns([run({ testVersion: 0 })], ctx);
+    assert.equal(only.current, false);
+    assert.deepEqual(only.reasons, ['test_changed']);
+    assert.deepEqual(deriveCriterionStatus('AC-001', [only]), { status: 'UNTESTED', runId: null });
   });
 
   it('lists every reason that applies', () => {

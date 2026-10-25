@@ -29,6 +29,7 @@ export const REASON_LABELS = Object.freeze({
   criterion_reworded: 'The criterion wording changed after this run.',
   criterion_removed: 'The criterion no longer exists in the current requirement.',
   build_changed: 'The app code is different from the code this run tested.',
+  test_changed: 'The test itself has changed since this run.',
   superseded_by_rerun: 'A later run of the same test replaced it as the current evidence.',
 });
 
@@ -224,6 +225,8 @@ export function assessRuns(runs, { latestVersion, criteria, currentBuildDigest }
     if (!criterion) reasons.push('criterion_removed');
     else if (criterion.signature !== run.criterionSignature) reasons.push('criterion_reworded');
     if (run.buildDigest !== currentBuildDigest) reasons.push('build_changed');
+    const test = getTest(run.testId);
+    if (test && run.testVersion !== test.version) reasons.push('test_changed');
     return { ...run, reasons, current: false };
   });
 

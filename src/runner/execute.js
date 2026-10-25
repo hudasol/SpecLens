@@ -3,6 +3,7 @@
 // which the evidence rules record as INCONCLUSIVE.
 
 import { spawn } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const CHILD = fileURLToPath(new URL('./child.mjs', import.meta.url));
@@ -38,10 +39,14 @@ export function executeScenario({ appPath, scenario, timeoutMs = DEFAULT_TIMEOUT
       resolve({ ...result, durationMs: Date.now() - started });
     };
 
+    // A one time token the app under test never sees. Only a line that carries it counts as the report.
+    const token = randomBytes(16).toString('hex');
+    const prefix = `${MARK}${token} `;
+
     let child;
     try {
       child = spawn(process.execPath, [CHILD, appPath, JSON.stringify(scenario)], {
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: ['pipe', 'pipe', 'pipe'],
         env: minimalEnv(),
         windowsHide: true,
       });
@@ -63,6 +68,8 @@ export function executeScenario({ appPath, scenario, timeoutMs = DEFAULT_TIMEOUT
         child.kill('SIGKILL');
       }
     };
+    child.stdin.on('error', () => {});
+    child.stdin.end(`${token}\n`);
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
     child.stdout.on('data', collect('out'));
@@ -81,7 +88,7 @@ export function executeScenario({ appPath, scenario, timeoutMs = DEFAULT_TIMEOUT
         finish({ status: 'failed', cause: 'invalid_output', detail: 'The test process printed far more output than a report needs and was stopped.' });
         return;
       }
-      const line = stdout.split('\n').reverse().find((text) => text.startsWith(MARK));
+      const line = stdout.split('\n').reverse().find((text) => text.startsWith(prefix));
       if (!line) {
         const crashed = signal !== null || code !== 0;
         finish({
@@ -94,7 +101,7 @@ export function executeScenario({ appPath, scenario, timeoutMs = DEFAULT_TIMEOUT
         return;
       }
       try {
-        finish({ status: 'completed', report: JSON.parse(line.slice(MARK.length)) });
+        finish({ status: 'completed', report: JSON.parse(line.slice(prefix.length)) });
       } catch {
         finish({ status: 'failed', cause: 'invalid_output', detail: 'The test process returned a report that is not valid JSON.' });
       }
