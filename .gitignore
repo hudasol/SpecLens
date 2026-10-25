@@ -1,0 +1,21 @@
+# Dependencies and build output
+node_modules/
+coverage/
+test-results/
+playwright-report/
+
+# Local demo state (event log and the working copy of the app under test)
+.speclens/
+
+# Secrets and private configuration
+.env
+.env.*
+!.env.example
+
+# Private learner context from the planning workflow, never published
+devpost/learner-profile.md
+
+# Logs and operating system files
+*.log
+.DS_Store
+Thumbs.db
