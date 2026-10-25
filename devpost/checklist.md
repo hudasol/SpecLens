@@ -9,7 +9,7 @@ The build is cut into thin slices. Each slice leaves the project in a working, t
 ## Slices
 
 - [x] 1. Project skeleton, the budget tracker with its seeded defect, the documented repair, and tests for both
-- [ ] 2. Domain model: events, requirements, catalog, evidence rules, derived state, replay
+- [x] 2. Domain model: events, requirements, catalog, evidence rules, derived state, replay
 - [ ] 3. Real test execution in an isolated process, with INCONCLUSIVE handling
 - [ ] 4. Service layer: the only place that changes state, plus atomic storage and reset
 - [ ] 5. Local HTTP server and JSON API
