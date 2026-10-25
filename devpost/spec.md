@@ -1,6 +1,6 @@
 ---
 doc: spec
-status: approved
+status: approved, then revised after the build
 ---
 
 # SpecLens 2.0: Technical Spec
@@ -79,13 +79,13 @@ PRD ref: prd.md > Features and Behavior > Evidence Lab
 
 PRD ref: prd.md > Features and Behavior > Evidence Contract and statuses
 
-`src/domain/evidence.js`. Pure functions: `classifyRun` turns raw runner output into PASS, FAIL or INCONCLUSIVE and never trusts the runner's own verdict; `verifyRecordedRun` recomputes a stored run's outcome from its own observations, so a stored PASS that the observations do not support is shown as INCONCLUSIVE; `assessRuns` says whether each run is current evidence or historical and why; `deriveCriterionStatus` gives a criterion's status from its current evidence, or UNTESTED; `explainRun` states what a run does and does not establish.
+`src/domain/evidence.js`. Pure functions: `classifyRun` turns raw runner output into PASS, FAIL or INCONCLUSIVE and never trusts the runner's own verdict; `verifyRecordedRun` recomputes a stored run's outcome from its own observations, so a stored PASS that the observations do not support is shown as INCONCLUSIVE, and the checks shown are recomputed from the observations as well; `assessRuns` says whether each run is current evidence or historical and why (the requirement version, the criterion wording, the app build or the test version changed, or a later run replaced it); `deriveCriterionStatus` gives a criterion's status from its current evidence, or UNTESTED; `explainRun` states what a run does and does not establish.
 
 ### Event log and state fold
 
 PRD ref: prd.md > Features and Behavior > Build Replay
 
-`src/domain/state.js` folds events into requirement versions, mappings, runs, the app build state, coverage and the next step. `src/domain/replay.js` builds the Build Replay rows and the list of remaining gaps from the same events. `src/services/store.js` persists events as JSON with atomic writes. The service serialises all changes.
+`src/domain/state.js` folds events into requirement versions, mappings, runs, the app build state, coverage and the next step. `src/domain/replay.js` builds the Build Replay rows and the list of remaining gaps from the same events. Rows show the verified outcome of each run, and the list of gaps uses the real app file, so a stored label or an edit made outside SpecLens cannot make the replay disagree with the Proof Map. `src/domain/privacy.js` keeps folders and user names out of recorded error details. `src/services/store.js` persists events as JSON with atomic writes. The service serialises all changes.
 
 ### Repair
 
@@ -101,7 +101,7 @@ PRD ref: prd.md > Features and Behavior > Evidence Lab
 
 PRD ref: prd.md > Screens and Layout
 
-`public/` holds one module per view (`views/intent.js`, `lab.js`, `map.js`, `replay.js`), shared helpers (`dom.js`, `views/shared.js`), a hash router in `app.js` and an API client. Views render from the state object and hold no business rules. The Proof Map chains are assembled in the browser from that state.
+`public/` holds one module per view (`views/intent.js`, `lab.js`, `map.js`, `replay.js`), shared helpers (`dom.js`, `views/shared.js`), a hash router in `app.js` and an API client. Views render from the state object and hold no business rules. The Proof Map chains are built in `src/domain/proofmap.js`, sent with the state as `proofMap`, and drawn by `views/map.js`, so tests can check them.
 
 ## Data Model
 
@@ -127,7 +127,7 @@ Derived, never stored: criterion status, requirement coverage, run currency (cur
 package.json            scripts: start, reset, test, test:ui
 server.js               starts the HTTP server
 demo-app/               the application under test (seeded defect)
-src/domain/             pure rules: catalog, events, requirements, interpreter, evidence, state, replay
+src/domain/             pure rules: catalog, events, requirements, interpreter, evidence, state, replay, proofmap, privacy
 src/runner/             isolated test execution
 src/services/           store, repair, service layer
 src/http/               API routes and static file server
@@ -150,7 +150,7 @@ None at runtime. No network calls, no accounts, no keys. A .env.example document
 - **The scenario precondition does not hold (the attempted expense is not larger than the remaining budget)** → INCONCLUSIVE, because the test did not establish what it claims to test.
 - **The user edits a criterion's wording after approval** → the test cannot run against the new version until the user confirms the link again.
 - **The working file no longer matches the seeded defect when the repair is requested** → the repair is refused with a clear message and nothing is changed.
-- **The state file is damaged** → the server refuses to start and says to run `npm run reset`.
+- **The state file is damaged, or is well formed but makes no sense as a record** → the server refuses to start and says to run `npm run reset`.
 - **The app file changes while a test is running** → INCONCLUSIVE with cause "build changed during run".
 - **A stored run does not match its own observations** (for example a hand edited PASS) → it is shown as INCONCLUSIVE and listed as an integrity issue.
 - **The test process prints far more than a report needs** → the process is stopped and the run is INCONCLUSIVE with cause "invalid output".
@@ -166,9 +166,10 @@ None at runtime. No network calls, no accounts, no keys. A .env.example document
 
 ## Decisions and Open Issues
 
-- Commits use the repository local identity Huda Mueen with the address chosen by the team. The license is MIT.
+- The license is MIT.
 - AC-002 (exact budget is allowed) is covered by the repository's developer unit tests but has no SpecLens evidence run, so the interface shows it as UNTESTED. This is intentional and explained in the interface and README.
 - Fonts are not bundled. The first version uses system fonts. A later step may add OFL licensed font files.
 - The test process is separate and time limited, but it is not a security sandbox. The app under test is the demo's own file and is trusted. Running unknown code would need real sandboxing.
+- The app under test runs inside the test process, because it has to be loaded to be observed. The process receives a one time token that the app never sees, and only a report carrying that token is accepted, so an app that merely prints a report cannot forge one. An app written to tamper with the test process itself could still fake what is observed. The mechanism guards against careless or accidental forgery, not against a hostile app.
 - This document was approved before the build and revised afterwards to match what was built. The differences are the file name `tracker.mjs`, `catalog.js` replacing `test-registry.js`, `testVersion` replacing a test digest, and the damaged state handling above.
 - The demo video and the Devpost description are written and recorded by the team, as the official workflow requires.

@@ -1,6 +1,6 @@
 # SpecLens 2.0: Two Minute Demonstration Script
 
-This script follows the story in `scope.md`. Everything on screen comes from a real run, so nothing needs to be faked or edited. Timings are a guide. The whole story fits in two minutes when each step is rehearsed once.
+This script follows the story in `scope.md`. Everything on screen comes from a real run, so nothing needs to be faked or edited. Timings are a guide. The spoken lines total about 150 words, which is roughly a minute of speech and leaves the rest of the two minutes for clicking. The authors have not timed a full recording yet, so rehearse once with a clock before recording.
 
 ## Before recording
 

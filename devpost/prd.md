@@ -1,6 +1,6 @@
 ---
 doc: prd
-status: approved
+status: approved, then revised after the build
 ---
 
 # SpecLens 2.0: Product Requirements
@@ -143,9 +143,8 @@ A coding agent, arbitrary repository analysis, automatic repair of arbitrary def
 
 ## Revision Note
 
-This document was approved before the build and was brought in line with what was built afterwards. The differences are: the request is written by the user and recorded on submit (not pre-recorded), the coverage line lives in the header strip, runs record a test version instead of a source digest, and a damaged state file stops the server with a clear message instead of showing a Reset button. Each acceptance box is ticked because an automated test or the browser check exercises it. The team should still confirm them by using the app.
+This document was approved before the build and was brought in line with what was built afterwards. The differences are: the request is written by the user and recorded on submit (not recorded in advance), the coverage line lives in the header strip, runs record a test version instead of a source digest, and a damaged state file stops the server with a clear message instead of showing a Reset button. A saved record that makes no sense, or a run record edited by hand, is detected and either refused at start or shown as inconclusive. Each acceptance box is ticked because an automated test or the browser check exercises it. The team should still confirm them by using the app.
 
 ## Open Questions
 
-- None open on identity: commits use the repository local identity Huda Mueen.
 - License: MIT, chosen to satisfy the open source requirement.

@@ -40,10 +40,10 @@ Every result is bound to one chain of records:
 
 Rules that keep the contract honest:
 
-- A test runs in a separate process. The process only reports what it observed. SpecLens works out the verdict itself, so a test cannot declare its own PASS.
-- A run only counts as current proof while the requirement version, the criterion wording and the application build all still match what the run used. Otherwise it is kept on record and labelled historical, with the reason.
+- A test runs in a separate process. The process only reports what it observed, and the report must carry a one time token that the app under test never sees. SpecLens works out the verdict itself, so a test cannot declare its own PASS, and an app that simply prints a report cannot forge one.
+- A run only counts as current proof while the requirement version, the criterion wording, the application build and the test version all still match what the run used. Otherwise it is kept on record and labelled historical, with the reason.
 - If you reword a criterion, the test is locked until you confirm that it still checks the new wording.
-- A stored PASS or FAIL is recomputed from its own observations whenever it is shown. A record that has been edited by hand, or that has no observations, is shown as INCONCLUSIVE and listed as an integrity issue.
+- A stored PASS or FAIL is recomputed from its own observations whenever it is shown, and so are the checks beside it. A record that has been edited by hand, or that has no observations, is shown as INCONCLUSIVE and listed as an integrity issue. A saved file that makes no sense at all stops the server from starting and says to run `npm run reset`.
 - A requirement is never labelled "verified". SpecLens only says how many of its criteria have current evidence.
 
 ## Install and run
@@ -56,9 +56,9 @@ cd SpecLens
 npm start
 ```
 
-Then open http://127.0.0.1:4173 in a browser. The server listens on this computer only. To use another port, set `PORT` before starting. The optional settings are listed in `.env.example`. No secret is ever needed.
+Then open http://127.0.0.1:4173 in a browser. The server listens on this computer only. To use another port, set `PORT` before starting. In PowerShell that is `$env:PORT=4300; npm start`, and on macOS or Linux it is `PORT=4300 npm start`. The optional settings are listed in `.env.example`. No secret is ever needed.
 
-The 171 automated tests were run on Node.js 20 and on Node.js 22, both on Linux. SpecLens has not yet been run on Windows or macOS, so please report anything that behaves differently there.
+The automated tests were run on Node.js 20 and on Node.js 22, both on Linux. SpecLens has not yet been run on Windows or macOS, so please report anything that behaves differently there.
 
 ## Run the automated tests
 
@@ -66,7 +66,7 @@ The 171 automated tests were run on Node.js 20 and on Node.js 22, both on Linux.
 npm test
 ```
 
-This runs 171 tests with the built in Node test runner: the budget tracker in both builds, the evidence rules, the interpreter, the isolated runner (including crashes, timeouts and flooding), the service and the whole journey, the HTTP server and its safety checks, and checks on the published files themselves.
+This runs 188 tests with the built in Node test runner: the budget tracker in both builds, the evidence rules, the interpreter, the isolated runner (including crashes, timeouts and flooding), the service and the whole journey, the HTTP server and its safety checks, and checks on the published files themselves.
 
 There is also a browser check that drives the real interface at desktop and phone widths:
 
@@ -74,7 +74,7 @@ There is also a browser check that drives the real interface at desktop and phon
 npm run test:ui
 ```
 
-It needs Playwright with a Chromium browser, which are not project dependencies. If they are not installed the script says so and does nothing. In the build environment it ran 32 checks (16 at each width) and all passed.
+It needs Playwright with a Chromium browser, which are not project dependencies. Install them for this check only with `npm install --no-save playwright` and `npx playwright install chromium`. If they are not installed the script says so and does nothing, and still exits normally. In the build environment it ran 32 checks (16 at each width) and all passed.
 
 ## Reset the demo
 
@@ -91,7 +91,7 @@ Both give the same starting point every time.
 The example is a student budget tracker. The budget is $100.00, $80.00 is already spent, so $20.00 remains. The test then tries to add a $25.00 expense, which is more than what is left.
 
 1. Start SpecLens and open **Intent Studio**.
-2. Press **Use the example request** (or type your own words), then **Propose a requirement**. The request is recorded, SpecLens lists what is unclear in it, and a proposal appears, marked as not yet agreed.
+2. Press **Use the example request** (or type a request of your own, although the offline interpreter only recognises the demo request and close rewordings of it, and says so for anything else), then **Propose a requirement**. The request is recorded, SpecLens lists what is unclear in it, and a proposal appears, marked as not yet agreed.
 3. Read the requirement and the two acceptance criteria. Edit them if you like, then press **Approve version 1**.
 4. Open **Evidence Lab** and press **Run TEST-001**.
 
@@ -138,11 +138,12 @@ Statuses are always shown as a word with a distinct shape, never colour alone. P
 
 ## Known limitations and the boundaries of the evidence
 
-- A PASS covers one scenario on one build. It does not show that the whole tracker is correct, and the interface says so beside every PASS.
+- A PASS covers one scenario on one build. It does not show that the whole tracker is correct. The run detail in Evidence Lab and the explanation box in the Proof Map both say so in plain words, although the short status badges elsewhere do not repeat it.
 - TEST-001 covers AC-001 only. AC-002 has no SpecLens run and shows UNTESTED. The repository's developer unit tests do exercise that behaviour, but they are not recorded in SpecLens and are not counted as evidence.
 - The test runs in a separate, time limited process, but that is not a security sandbox. The app under test is the demonstration's own file and is trusted. Running unknown code would need real sandboxing.
+- The app under test is loaded inside the test process, so an app written to tamper with that process could still fake what is observed. The one time token stops careless forgery, such as an app that prints a report, not a determined attacker.
 - The saved state is a plain JSON file in `.speclens/`. SpecLens detects an edited run record and refuses to show it as proof, but anyone who can edit the file can still change what the timeline says happened. It is a tool for honest working, not a tamper proof audit log.
-- The interface uses system fonts only. Colours and layout were checked with an automated accessibility scan and with screenshots at desktop and phone widths, but not with a screen reader.
+- The interface uses system fonts only. Colours and layout were checked with an automated accessibility scan run during development (it is not part of this repository, so it cannot be repeated from here) and with screenshots at desktop and phone widths. A screen reader was not used.
 - Playwright and the accessibility scanner used during development are not part of the repository.
 
 ## Project layout
