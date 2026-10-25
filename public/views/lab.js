@@ -210,7 +210,7 @@ function repairPanel(ctx) {
     h('p', null, repair.explanation),
     h(
       'pre',
-      { class: 'diff', 'aria-label': `Patch for ${repair.patch.file}` },
+      { class: 'diff', tabindex: '0', role: 'region', 'aria-label': `Patch for ${repair.patch.file}` },
       h('span', { class: 'diff-file' }, `${repair.patch.file}\n`),
       repair.patch.removed.map((line) => h('span', { class: 'diff-removed' }, `- ${line}\n`)),
       repair.patch.added.map((line) => h('span', { class: 'diff-added' }, `+ ${line}\n`)),

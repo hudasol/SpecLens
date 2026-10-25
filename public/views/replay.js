@@ -54,6 +54,12 @@ export function renderReplay(ctx) {
         h('p', null, item.detail),
         item.annotations.map(annotationBlock),
         h('p', { class: 'small' }, itemLink(item)),
+        h(
+          'details',
+          { class: 'raw' },
+          h('summary', null, 'Show the recorded event'),
+          h('pre', { tabindex: '0', role: 'region', 'aria-label': `Recorded event ${item.eventId}` }, JSON.stringify(state.events[item.seq - 1], null, 2)),
+        ),
       ),
     ),
   );

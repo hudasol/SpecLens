@@ -30,6 +30,7 @@ describe('starting state', () => {
     const state = logBuilder().propose().state();
     assert.equal(state.requirement.versions.length, 1);
     assert.equal(state.requirement.versions[0].status, 'draft');
+    assert.equal(state.interpretation.clarifications.length, 3, 'what is unclear is recorded with the proposal');
     assert.equal(state.nextStep.code, 'approve');
     assert.deepEqual(state.criteria.map((c) => c.status), ['UNTESTED', 'UNTESTED']);
     assert.equal(state.tests[0].runnable.code, 'not_approved');

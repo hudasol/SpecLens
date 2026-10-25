@@ -20,6 +20,8 @@ describe('offline interpreter', () => {
       ],
     );
     assert.equal(result.proposal.requirementText, CANONICAL.requirementText);
+    assert.equal(result.proposal.clarifications.length, 3);
+    assert.ok(result.proposal.clarifications.every((question) => question.endsWith('?')));
   });
 
   it('recognises close rewordings and curly apostrophes', () => {

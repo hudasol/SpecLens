@@ -1,4 +1,4 @@
-import { chip, h, idCode, notice, statusBadge } from '../dom.js';
+import { bulletList, chip, h, idCode, notice, statusBadge } from '../dom.js';
 import { formatDateTime } from '../format.js';
 import { pageHeading, panel } from './shared.js';
 
@@ -34,6 +34,14 @@ function requestPanel(ctx) {
         idCode(state.interpretation.interpreter),
         ', an offline rule based interpreter. No AI service was called and nothing left this computer.',
       ),
+      h('h3', null, 'Why this cannot be tested yet'),
+      h(
+        'p',
+        null,
+        'A test needs an exact rule, and this request leaves several things open:',
+      ),
+      bulletList(state.interpretation.clarifications),
+      h('p', null, 'The proposed requirement below answers each question in plain words, so you can check that it matches what you meant.'),
     );
   }
 
@@ -101,7 +109,7 @@ function requestPanel(ctx) {
       h(
         'p',
         { class: 'hint' },
-        'This is an offline demo interpreter. It recognises the example request and close rewordings, and tells you plainly when it does not.',
+        'A request like this cannot be tested as it stands. SpecLens will list what is unclear and propose a requirement for you to edit. This is an offline demo interpreter: it recognises the example request and close rewordings, and tells you plainly when it does not.',
       ),
     ),
   );
@@ -238,7 +246,7 @@ function requirementPanel(ctx) {
     isDraft
       ? notice(
           'info',
-          'This version is a draft. Approving it means you accept this wording as the standard the tests are measured against.',
+          'This proposal is a draft and is not yet agreed. Approving it means you accept this wording as the standard the tests are measured against.',
         )
       : notice(
           'info',

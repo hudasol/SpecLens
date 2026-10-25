@@ -190,6 +190,7 @@ export function deriveState(events, ctx) {
         interpretation = {
           intentId: data.intentId,
           interpreter: data.interpreter,
+          clarifications: Array.isArray(data.clarifications) ? data.clarifications : [],
           proposedAt: event.at,
           eventId: event.id,
         };

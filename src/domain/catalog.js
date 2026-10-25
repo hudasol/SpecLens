@@ -8,6 +8,12 @@ export const REQUIREMENT_ID = 'REQ-001';
 export const INTENT_EXAMPLE = "Don't let students overspend.";
 
 export const CANONICAL = Object.freeze({
+  // What is unclear in the plain request. The proposed requirement answers each question.
+  clarifications: Object.freeze([
+    'What counts as overspending: more than the whole budget, or more than what is left after earlier expenses?',
+    'Is spending exactly the amount that is left allowed?',
+    'When an expense is refused, should the balance and the expense history stay exactly as they were?',
+  ]),
   requirementText: 'A student must not be able to spend more than the budget they have left.',
   criteria: Object.freeze([
     Object.freeze({

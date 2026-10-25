@@ -92,7 +92,7 @@ export function runDetail(run) {
           'details',
           { class: 'raw' },
           h('summary', null, 'Raw observations from the test process'),
-          h('pre', null, JSON.stringify(run.observations, null, 2)),
+          h('pre', { tabindex: '0', role: 'region', 'aria-label': `Raw observations for ${run.id}` }, JSON.stringify(run.observations, null, 2)),
         )
       : null,
   );

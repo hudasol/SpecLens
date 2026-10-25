@@ -35,6 +35,7 @@ export function interpretIntent(rawText) {
       requirementId: REQUIREMENT_ID,
       version: 1,
       requirementText: CANONICAL.requirementText,
+      clarifications: [...CANONICAL.clarifications],
       criteria: CANONICAL.criteria.map((criterion) => ({
         id: criterion.id,
         text: criterion.text,

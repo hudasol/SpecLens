@@ -101,6 +101,8 @@ async function journey(browser, label, viewport) {
     const items = await stripItems(page);
     expect(items.length === 2 && items.every((item) => item.endsWith('UNTESTED')), `strip was ${items.join(' | ')}`);
     expect(await page.getByRole('button', { name: 'Approve version 1' }).isEnabled(), 'approve is disabled');
+    await page.getByText('Why this cannot be tested yet').waitFor();
+    await page.getByText('is not yet agreed').waitFor();
     await noSideScroll(page);
     await shot('02-draft');
   });
@@ -186,6 +188,8 @@ async function journey(browser, label, viewport) {
     expect((await page.locator('.timeline-item').count()) === 6, 'expected six recorded events');
     expect((await page.locator('.annotation').count()) === 3, 'expected three result changes');
     expect(squash(await page.locator('.annotation').first().innerText()).includes('UNTESTED to FAIL'), 'first change is wrong');
+    await page.locator('.timeline-item').nth(3).locator('summary').click();
+    expect(squash(await page.locator('.timeline-item').nth(3).locator('pre').innerText()).includes('"type": "test_run_recorded"'), 'the recorded event cannot be expanded');
     await page.locator('#replay-range').fill('2');
     expect((await page.locator('.timeline-item.future').count()) === 4, 'scrubbing did not dim later events');
     await page.locator('#replay-range').fill('6');
