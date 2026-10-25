@@ -14,7 +14,7 @@ import { LIMITS, contentDigest, validateEdit } from '../domain/requirements.js';
 import { deriveState } from '../domain/state.js';
 import { DEFAULT_TIMEOUT_MS, executeScenario } from '../runner/execute.js';
 import { REPAIR_001, applyRepairToSource, describePatch } from './repair.js';
-import { createStore, writeFileAtomic } from './store.js';
+import { StateFileError, createStore, writeFileAtomic } from './store.js';
 
 export class ServiceError extends Error {
   constructor(code, message, status = 400) {
@@ -47,6 +47,16 @@ export async function createService({
     await writeFileAtomic(appPath, seedSource);
   }
   let events = await store.load();
+
+  // A file can be valid JSON with a valid shape and still be nonsense for SpecLens, for example a run
+  // with its checks removed. Find that now, with a clear message, and not on the first request.
+  try {
+    const ctx = await context();
+    deriveState(events, ctx);
+    buildReplay(events, ctx);
+  } catch {
+    throw new StateFileError('The saved state is damaged and cannot be read as a SpecLens record. Run "npm run reset" to start again.');
+  }
 
   let chain = Promise.resolve();
   function exclusive(task) {

@@ -149,8 +149,12 @@ describe('verifying a stored run', () => {
   };
 
   it('accepts a PASS and a FAIL that their own observations support', () => {
-    assert.deepEqual(verifyRecordedRun(stored(false)), { outcome: 'PASS', cause: null, consistent: true });
-    assert.deepEqual(verifyRecordedRun(stored(true)), { outcome: 'FAIL', cause: null, consistent: true });
+    for (const [accepts, outcome] of [[false, 'PASS'], [true, 'FAIL']]) {
+      const result = verifyRecordedRun(stored(accepts));
+      assert.deepEqual([result.outcome, result.cause, result.consistent], [outcome, null, true]);
+      assert.ok(result.checks.length >= 4, 'the checks are recomputed from the observations');
+      assert.equal(typeof result.detail, 'string');
+    }
   });
 
   it('demotes a PASS that the observations contradict', () => {

@@ -13,7 +13,7 @@ import {
 import { contentDigest, withSignature } from './requirements.js';
 
 function buildCriteria(list, previous = []) {
-  return list.map((item) => {
+  return (Array.isArray(list) ? list : []).map((item) => {
     const earlier = previous.find((criterion) => criterion.id === item.id);
     const testId = item.testId !== undefined ? item.testId : (earlier?.testId ?? null);
     return withSignature({ id: item.id, text: item.text, testId });
@@ -298,6 +298,8 @@ export function deriveState(events, ctx) {
       recordedOutcome: run.outcome,
       outcome: check.outcome,
       cause: check.cause ?? null,
+      checks: check.checks ?? (Array.isArray(run.checks) ? run.checks : []),
+      detail: check.detail ?? run.detail,
     };
   });
 

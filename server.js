@@ -30,7 +30,7 @@ const server = createHttpServer({ service, publicDir: path.join(root, 'public'),
 
 server.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
-    console.error(`SpecLens could not start: port ${port} is already in use. Try: PORT=${port + 1} npm start`);
+    console.error(`SpecLens could not start: port ${port} is already in use. Set another port first. PowerShell: $env:PORT=${port + 1}; npm start. macOS and Linux: PORT=${port + 1} npm start`);
   } else {
     console.error(`SpecLens could not start: ${error.message}`);
   }

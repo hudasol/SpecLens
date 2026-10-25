@@ -209,7 +209,9 @@ export function verifyRecordedRun(run) {
       ? { outcome: 'INCONCLUSIVE', cause: again.cause, consistent: true }
       : { outcome: 'INCONCLUSIVE', cause: 'record_inconsistent', consistent: false };
   }
-  return { outcome: again.outcome, cause: null, consistent: true };
+  // The shown checks and detail are recomputed from the observations as well, so a hand edited
+  // copy of them in the saved file cannot change what the interface displays.
+  return { outcome: again.outcome, cause: null, consistent: true, checks: again.checks, detail: again.detail };
 }
 
 // Decides which runs still count as current evidence for the latest requirement version.
@@ -281,7 +283,7 @@ export function explainRun(run) {
     };
   }
 
-  const violated = run.checks.filter((check) => check.kind === 'assertion' && check.status === 'violated');
+  const violated = (Array.isArray(run.checks) ? run.checks : []).filter((check) => check.kind === 'assertion' && check.status === 'violated');
   return {
     headline: 'The test ran and at least one assertion was violated.',
     proves: [

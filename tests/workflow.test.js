@@ -180,6 +180,44 @@ describe('persistence', () => {
     await assert.rejects(createService({ dataDir, seedPath: SEED_PATH }), /damaged/);
   });
 
+  it('also refuses a file that is well formed but makes no sense as a record', async () => {
+    const { service, dataDir } = await approvedService();
+    await service.runTest('TEST-001');
+    const file = path.join(dataDir, 'state.json');
+    const saved = JSON.parse(await readFile(file, 'utf8'));
+
+    const noCriteria = structuredClone(saved);
+    delete noCriteria.events.find((event) => event.type === 'interpretation_proposed').data.criteria;
+    await writeFile(file, JSON.stringify(noCriteria));
+    await assert.rejects(createService({ dataDir, seedPath: SEED_PATH }), /damaged.*npm run reset/);
+
+  });
+
+  it('shows the checks the observations support, not a hand edited copy of them', async () => {
+    const { service, dataDir } = await approvedService();
+    await service.runTest('TEST-001');
+    const file = path.join(dataDir, 'state.json');
+    const saved = JSON.parse(await readFile(file, 'utf8'));
+    const record = saved.events.at(-1).data;
+    const honest = record.checks.map((check) => check.actual);
+    record.checks.forEach((check) => {
+      check.actual = 'edited by hand';
+      check.status = 'held';
+    });
+    await writeFile(file, JSON.stringify(saved));
+
+    const again = await createService({ dataDir, seedPath: SEED_PATH });
+    const state = await again.getState();
+    assert.equal(state.runs[0].outcome, 'FAIL');
+    assert.deepEqual(state.runs[0].checks.map((check) => check.actual), honest);
+
+    delete record.checks;
+    await writeFile(file, JSON.stringify(saved));
+    const missing = await (await createService({ dataDir, seedPath: SEED_PATH })).getState();
+    assert.equal(missing.runs[0].outcome, 'FAIL');
+    assert.deepEqual(missing.runs[0].checks.map((check) => check.actual), honest);
+  });
+
   it('shows a hand edited PASS as inconclusive rather than believing it', async () => {
     const { service, dataDir } = await approvedService();
     await service.runTest('TEST-001');
