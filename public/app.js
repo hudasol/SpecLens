@@ -67,6 +67,7 @@ async function refreshQuietly() {
 
 async function act(task, describe, working = null) {
   if (ui.busy) return null;
+  const origin = document.activeElement;
   ui.busy = true;
   ui.working = working;
   ui.notice = null;
@@ -84,6 +85,12 @@ async function act(task, describe, working = null) {
     ui.busy = false;
     ui.working = null;
     render();
+    // The page is rebuilt after every action. If the control that was used is gone, keep keyboard and
+    // screen reader users in the page by moving focus to the message about what just happened.
+    const lost = !document.activeElement || document.activeElement === document.body;
+    if (origin && origin !== document.body && lost) {
+      (document.getElementById('notice') ?? els.main).focus();
+    }
   }
 }
 
@@ -201,7 +208,10 @@ function render() {
   }
 
   if (ui.notice) {
-    els.main.append(notice(ui.notice.kind, ui.notice.text));
+    const message = notice(ui.notice.kind, ui.notice.text);
+    message.id = 'notice';
+    message.tabIndex = -1;
+    els.main.append(message);
     if (ui.notice.kind !== 'error') announce(ui.notice.text);
   }
   els.main.append(

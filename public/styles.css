@@ -827,8 +827,9 @@ fieldset.criterion legend {
   background: var(--accent);
   border-radius: 50%;
 }
+/* Events after the replay position are set back, but their text keeps readable contrast. */
 .timeline-item.future {
-  opacity: 0.3;
+  opacity: 0.7;
 }
 .timeline-item h3 {
   margin: 2px 0 4px;

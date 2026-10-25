@@ -150,6 +150,9 @@ async function journey(browser, label, viewport) {
     const history = squash(await page.locator('.run-list').innerText());
     expect(history.includes('RUN-0001') && history.includes('FAIL') && history.includes('Historical'), `history was ${history}`);
     expect(history.includes('The app code is different'), 'the reason is not shown');
+    expect((await page.getByText('The app accepted it.').count()) === 0, 'an answer from the earlier build is still shown');
+    const focused = await page.evaluate(() => Boolean(document.activeElement) && document.activeElement !== document.body);
+    expect(focused, 'focus was dropped after the action');
   });
 
   await check(name('the same test now passes, and both runs stay on record'), async () => {

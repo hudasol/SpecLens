@@ -19,7 +19,9 @@ export function emptyState(text, linkHref, linkText) {
 }
 
 export function currentChip(run) {
-  return run.current ? chip('Current evidence', 'current') : chip('Historical', 'historical');
+  if (!run.current) return chip('Historical', 'historical');
+  // An inconclusive run is the current result for its criterion, but it is not evidence of anything.
+  return run.outcome === 'INCONCLUSIVE' ? chip('Current result, no evidence', 'current') : chip('Current evidence', 'current');
 }
 
 function checksTable(run) {

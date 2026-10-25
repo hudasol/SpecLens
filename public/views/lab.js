@@ -110,7 +110,10 @@ function probePanel(ctx) {
       }),
       h('button', { type: 'submit', class: 'button button-secondary', disabled: busy }, ui.working === 'probe' ? 'Trying...' : 'Try this expense'),
     ),
-    ui.probe ? h('p', { class: 'probe-result' }, describeProbe(ui.probe)) : null,
+    // An answer from an earlier build would mislead after a repair, so it is shown only for the current build.
+    ui.probe && ui.probe.build === ctx.state.app.shortDigest
+      ? h('p', { class: 'probe-result' }, describeProbe(ui.probe))
+      : null,
     h('p', { class: 'hint' }, 'A hands on try is not evidence. Nothing is recorded and no result changes.'),
   );
 }
