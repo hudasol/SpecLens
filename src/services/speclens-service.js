@@ -10,6 +10,7 @@ import { makeEvent, runId } from '../domain/events.js';
 import { INTERPRETER_ID, interpretIntent } from '../domain/interpreter.js';
 import { parseDollarsToCents } from '../domain/money.js';
 import { scrubPaths } from '../domain/privacy.js';
+import { buildProofMap } from '../domain/proofmap.js';
 import { buildReplay } from '../domain/replay.js';
 import { LIMITS, contentDigest, validateEdit } from '../domain/requirements.js';
 import { deriveState } from '../domain/state.js';
@@ -89,6 +90,7 @@ export async function createService({
     return {
       ...state,
       events: log,
+      proofMap: buildProofMap(state),
       replay: buildReplay(log, ctx),
       scenario: SCENARIO,
       example: INTENT_EXAMPLE,

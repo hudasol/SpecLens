@@ -2,46 +2,9 @@ import { bulletList, chip, h, idCode, statusBadge } from '../dom.js';
 import { formatDateTime } from '../format.js';
 import { emptyState, pageHeading, panel, runDetail, runSummaryLine } from './shared.js';
 
-function chainFor(state, criterion) {
-  const test = criterion.testId ? state.tests.find((item) => item.id === criterion.testId) : null;
-  const current = state.runs.find((run) => run.id === criterion.currentRunId) ?? null;
-  const requirement = state.requirement;
-  const latest = requirement.versions[requirement.versions.length - 1];
-
-  return [
-    {
-      id: state.intent.id,
-      kind: 'Request',
-      title: state.intent.id,
-      text: state.intent.text,
-    },
-    {
-      id: requirement.id,
-      kind: 'Requirement',
-      title: `${requirement.id} version ${latest.version}`,
-      text: latest.requirementText,
-      badge: chip(latest.status, latest.status),
-    },
-    {
-      id: criterion.id,
-      kind: 'Criterion',
-      title: criterion.id,
-      text: criterion.text,
-    },
-    test
-      ? { id: test.id, kind: 'Test', title: test.id, text: test.title }
-      : { id: `NOTEST-${criterion.id}`, kind: 'Test', title: 'No test', text: 'No SpecLens test covers this criterion.' },
-    current
-      ? { id: current.id, kind: 'Run', title: current.id, text: current.detail, badge: statusBadge(current.outcome) }
-      : { id: `NORUN-${criterion.id}`, kind: 'Run', title: 'No current run', text: 'There is no current evidence.' },
-    {
-      id: `EXPL-${criterion.id}`,
-      kind: 'Explanation',
-      title: 'What it proves',
-      text: current ? current.explanation.headline : criterion.untestedReason ?? 'Nothing is claimed.',
-      badge: statusBadge(criterion.status),
-    },
-  ];
+function badgeFor(badge) {
+  if (!badge) return null;
+  return badge.type === 'status' ? statusBadge(badge.value) : chip(badge.value, badge.value);
 }
 
 export function renderMap(ctx) {
@@ -59,17 +22,15 @@ export function renderMap(ctx) {
   const selected = route.param;
   const select = (id) => navigate(`map/${encodeURIComponent(id)}`);
 
-  const chains = state.criteria.map((criterion) => {
-    const nodes = chainFor(state, criterion);
-    const historical = state.runs.filter((run) => run.criterionId === criterion.id && !run.current);
-    return h(
+  const chains = state.proofMap.map((chain) =>
+    h(
       'section',
       { class: 'panel chain-panel' },
-      h('h2', null, 'Chain for ', idCode(criterion.id), ' ', statusBadge(criterion.status)),
+      h('h2', null, 'Chain for ', idCode(chain.criterionId), ' ', statusBadge(chain.status)),
       h(
         'ol',
         { class: 'chain' },
-        nodes.map((node) =>
+        chain.nodes.map((node) =>
           h(
             'li',
             null,
@@ -85,34 +46,34 @@ export function renderMap(ctx) {
               h('span', { class: 'node-kind' }, node.kind),
               h('span', { class: 'node-title' }, node.title),
               h('span', { class: 'node-text' }, node.text),
-              node.badge ?? null,
+              badgeFor(node.badge),
             ),
           ),
         ),
       ),
-      historical.length
+      chain.earlierRuns.length
         ? h(
             'div',
             { class: 'earlier' },
-            h('p', { class: 'small' }, `Earlier runs for ${criterion.id}, kept on record:`),
+            h('p', { class: 'small' }, `Earlier runs for ${chain.criterionId}, kept on record:`),
             h(
               'ul',
               { class: 'plain-list inline-list' },
-              historical.map((run) =>
+              chain.earlierRuns.map((run) =>
                 h(
                   'li',
                   null,
-                  h('button', { type: 'button', class: 'link-button', onclick: () => select(run.id) }, run.id),
+                  h('button', { type: 'button', class: 'link-button', onclick: () => select(run.runId) }, run.runId),
                   ' ',
                   statusBadge(run.outcome),
-                  h('span', { class: 'small' }, ` historical: ${run.reasonLabels.join(' ')}`),
+                  h('span', { class: 'small' }, ` historical: ${run.reasons.join(' ')}`),
                 ),
               ),
             ),
           )
         : null,
-    );
-  });
+    ),
+  );
 
   return h(
     'div',
