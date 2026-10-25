@@ -181,6 +181,7 @@ function detailFor(state, id) {
       h('p', { class: 'meta' }, 'Current status ', statusBadge(criterion.status)),
       criterion.untestedReason ? h('p', null, criterion.untestedReason) : null,
       h('p', { class: 'meta' }, `Test pairing: ${mapping}`),
+      h('p', null, h('a', { href: '#/intent' }, 'Open Intent Studio')),
     );
   }
 
@@ -217,6 +218,7 @@ function detailFor(state, id) {
         { class: 'stack' },
         h('p', null, `No SpecLens test covers ${target.id}, so nothing was run for it and its status is ${target.status}.`),
         h('p', { class: 'hint' }, 'Developer unit tests in the repository may cover this behaviour, but they are not recorded here and are not counted as evidence.'),
+        h('p', null, h('a', { href: '#/intent' }, 'Open Intent Studio')),
       );
     }
     if (missing[1] === 'NORUN') {
@@ -228,6 +230,7 @@ function detailFor(state, id) {
         earlier.length
           ? h('ul', { class: 'plain-list' }, earlier.map((item) => h('li', null, runSummaryLine(item), h('span', { class: 'small' }, ` ${item.reasonLabels.join(' ')}`))))
           : null,
+        h('p', null, h('a', { href: '#/lab' }, 'Open Evidence Lab')),
       );
     }
     const current = state.runs.find((item) => item.id === target.currentRunId);
@@ -240,12 +243,14 @@ function detailFor(state, id) {
           current.explanation.proves.length ? bulletList(current.explanation.proves) : null,
           h('h3', null, 'What it does not show'),
           bulletList(current.explanation.doesNotProve),
+          h('p', null, h('a', { href: '#/replay' }, 'See when this changed in Build Replay')),
         )
       : h(
           'div',
           { class: 'stack' },
           h('p', { class: 'headline' }, `${target.id} is ${target.status}. Nothing is claimed about it.`),
           h('p', null, target.untestedReason ?? ''),
+          h('p', null, h('a', { href: '#/replay' }, 'See when this changed in Build Replay')),
         );
   }
   return null;
